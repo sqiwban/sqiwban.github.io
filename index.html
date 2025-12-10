@@ -7,12 +7,11 @@
     <link rel="stylesheet" href="styles.css">
 
     <style>
-        /* Анимация для плавного раскрытия */
         .expand-area {
             overflow: hidden;
             max-height: 0;
             opacity: 0;
-            transition: max-height 0.35s ease, opacity 0.35s ease;
+            transition: max-height 0.35s ease, opacity 0.35s ease, padding 0.3s ease;
             padding: 0 16px;
             background: #f8f8f8;
             border-radius: 12px;
@@ -20,7 +19,7 @@
             margin-top: 10px;
         }
         .expand-area.open {
-            max-height: 500px;
+            max-height: 600px;
             opacity: 1;
             padding: 16px;
         }
@@ -37,13 +36,19 @@
         }
         .download-btn:hover { transform: translateY(-2px); }
 
-        #qrcode { margin-top: 8px; }
+        #qrcode canvas {
+            border-radius: 12px;      /* скругляем */
+            image-rendering: crisp-edges;
+        }
+        #qrcode img { border-radius: 12px; }
+
         .url-text {
             margin-top: 8px;
             font-size: 0.9rem;
             color: #56606a;
             word-break: break-all;
         }
+
         .link-card.expandable { cursor: pointer; }
     </style>
 </head>
@@ -76,14 +81,15 @@
                     <p>Application blocked by Java Security</p>
                 </a>
 
-                <!-- Блок Fusion APK с раскрытием -->
                 <div class="link-card expandable" id="fusionCard" role="button" aria-expanded="false">
                     <h3>📱 Fusion APK</h3>
                     <p>Актуальная версия приложения</p>
 
                     <div class="expand-area" id="fusionExpand">
                         <a id="fusionLink" href="http://office.luxsoft.by:25881/bcs/by/bks/luxsoft-tsd.apk" target="_blank" class="download-btn" rel="noopener">⬇️ Скачать APK</a>
+
                         <div id="qrcode"></div>
+
                         <div class="url-text" id="urlText"></div>
                     </div>
                 </div>
@@ -96,7 +102,6 @@
         </footer>
     </div>
 
-    <!-- QR Code generation library -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 
     <script>
@@ -122,11 +127,12 @@
 
             if (expanded) {
                 expandArea.classList.add('open');
+
                 if (!qrGenerated) {
                     new QRCode(qrcodeContainer, {
                         text: apkUrl,
-                        width: 180,
-                        height: 180,
+                        width: 220,
+                        height: 220,
                         correctLevel: QRCode.CorrectLevel.H
                     });
                     qrGenerated = true;
