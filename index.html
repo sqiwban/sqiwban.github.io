@@ -5,6 +5,47 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>GorAdmin</title>
     <link rel="stylesheet" href="styles.css">
+
+    <style>
+        /* Анимация для плавного раскрытия */
+        .expand-area {
+            overflow: hidden;
+            max-height: 0;
+            opacity: 0;
+            transition: max-height 0.35s ease, opacity 0.35s ease;
+            padding: 0 16px;
+            background: #f8f8f8;
+            border-radius: 12px;
+            box-shadow: inset 0 0 10px rgba(0,0,0,0.05);
+            margin-top: 10px;
+        }
+        .expand-area.open {
+            max-height: 500px;
+            opacity: 1;
+            padding: 16px;
+        }
+
+        .download-btn {
+            display: inline-block;
+            margin-bottom: 12px;
+            padding: 10px 16px;
+            background: #667eea;
+            color: white;
+            border-radius: 10px;
+            text-decoration: none;
+            transition: 0.18s;
+        }
+        .download-btn:hover { transform: translateY(-2px); }
+
+        #qrcode { margin-top: 8px; }
+        .url-text {
+            margin-top: 8px;
+            font-size: 0.9rem;
+            color: #56606a;
+            word-break: break-all;
+        }
+        .link-card.expandable { cursor: pointer; }
+    </style>
 </head>
 <body>
     <div class="container">
@@ -15,7 +56,6 @@
 
         <main class="main-content">
             <div class="links-grid">
-                <!-- Эти скроются на мобильных -->
                 <a href='activator.bat' class="link-card desktop-item">
                     <h3>🎯 Активатор Windows/Office</h3>
                     <p>Активация операционной системы и пакета Office</p>
@@ -36,11 +76,17 @@
                     <p>Application blocked by Java Security</p>
                 </a>
 
-                <!-- Эта будет всегда -->
-                <a href='http://office.luxsoft.by:25881/bcs/by/bks/luxsoft-tsd.apk' target="_blank" class="link-card">
+                <!-- Блок Fusion APK с раскрытием -->
+                <div class="link-card expandable" id="fusionCard" role="button" aria-expanded="false">
                     <h3>📱 Fusion APK</h3>
                     <p>Актуальная версия приложения</p>
-                </a>
+
+                    <div class="expand-area" id="fusionExpand">
+                        <a id="fusionLink" href="http://office.luxsoft.by:25881/bcs/by/bks/luxsoft-tsd.apk" target="_blank" class="download-btn" rel="noopener">⬇️ Скачать APK</a>
+                        <div id="qrcode"></div>
+                        <div class="url-text" id="urlText"></div>
+                    </div>
+                </div>
 
             </div>
         </main>
@@ -49,5 +95,46 @@
             <p>&copy; goradmin</p>
         </footer>
     </div>
+
+    <!-- QR Code generation library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+
+    <script>
+        const apkUrl = 'http://office.luxsoft.by:25881/bcs/by/bks/luxsoft-tsd.apk';
+
+        const fusionCard = document.getElementById('fusionCard');
+        const expandArea = document.getElementById('fusionExpand');
+        const fusionLink = document.getElementById('fusionLink');
+        const qrcodeContainer = document.getElementById('qrcode');
+        const urlText = document.getElementById('urlText');
+
+        fusionLink.href = apkUrl;
+        urlText.textContent = apkUrl;
+
+        let qrGenerated = false;
+        let expanded = false;
+
+        fusionCard.addEventListener('click', (e) => {
+            if (e.target.closest('#fusionLink')) return;
+
+            expanded = !expanded;
+            fusionCard.setAttribute('aria-expanded', expanded);
+
+            if (expanded) {
+                expandArea.classList.add('open');
+                if (!qrGenerated) {
+                    new QRCode(qrcodeContainer, {
+                        text: apkUrl,
+                        width: 180,
+                        height: 180,
+                        correctLevel: QRCode.CorrectLevel.H
+                    });
+                    qrGenerated = true;
+                }
+            } else {
+                expandArea.classList.remove('open');
+            }
+        });
+    </script>
 </body>
 </html>
